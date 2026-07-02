@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign up — Fieldnote</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">field<span>note</span></a>
+    <nav class="main-nav">
+      <a href="index.html">Find jobs</a>
+      <a href="post-job.html">Post a job</a>
+    </nav>
+    <div id="nav-user-slot"></div>
+  </div>
+</header>
+
+<div class="form-card">
+  <h1>Create your account</h1>
+  <p class="sub">Choose how you'll use Fieldnote.</p>
+  <form id="register-form">
+    <div class="role-toggle">
+      <label><input type="radio" name="role" value="seeker" checked /><span>I'm job hunting</span></label>
+      <label><input type="radio" name="role" value="employer" /><span>I'm hiring</span></label>
+    </div>
+    <div class="field">
+      <label for="name">Full name</label>
+      <input type="text" id="name" required />
+    </div>
+    <div class="field" id="company-field" style="display:none">
+      <label for="companyName">Company name</label>
+      <input type="text" id="companyName" />
+    </div>
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" required />
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" minlength="6" required />
+    </div>
+    <button type="submit" class="btn btn-primary" style="width:100%">Create account</button>
+    <p id="msg" class="form-msg"></p>
+  </form>
+  <p class="form-foot">Already have an account? <a href="login.html" style="color:var(--brand);font-weight:600">Log in</a></p>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+const roleInputs = document.querySelectorAll('input[name="role"]');
+const companyField = document.getElementById('company-field');
+roleInputs.forEach((input) => {
+  input.addEventListener('change', () => {
+    companyField.style.display = input.value === 'employer' && input.checked ? 'block' : companyField.style.display;
+    if (input.checked) companyField.style.display = input.value === 'employer' ? 'block' : 'none';
+  });
+});
+
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('msg');
+  msg.textContent = '';
+  msg.className = 'form-msg';
+  const role = document.querySelector('input[name="role"]:checked').value;
+  try {
+    const data = await apiRequest('/auth/register', {
+      method: 'POST',
+      body: {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+        role,
+        companyName: document.getElementById('companyName').value,
+      },
+    });
+    Auth.setSession(data.token, data.user);
+    window.location.href = role === 'employer' ? 'employer-dashboard.html' : 'seeker-dashboard.html';
+  } catch (err) {
+    msg.textContent = err.message;
+    msg.classList.add('error');
+  }
+});
+</script>
+</body>
+</html>

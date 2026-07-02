@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Post a job — Fieldnote</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">field<span>note</span></a>
+    <nav class="main-nav">
+      <a href="index.html">Find jobs</a>
+      <a href="post-job.html">Post a job</a>
+    </nav>
+    <div id="nav-user-slot"></div>
+  </div>
+</header>
+
+<div class="form-card wide">
+  <h1>Post a new opening</h1>
+  <p class="sub">Visible to every job seeker immediately after posting.</p>
+  <div id="gate"></div>
+  <form id="job-form" style="display:none">
+    <div class="field">
+      <label for="title">Job title</label>
+      <input type="text" id="title" required />
+    </div>
+    <div class="field">
+      <label for="company">Company name</label>
+      <input type="text" id="company" required />
+    </div>
+    <div class="field">
+      <label for="location">Location</label>
+      <input type="text" id="location" required />
+    </div>
+    <div class="field">
+      <label for="category">Category</label>
+      <input type="text" id="category" placeholder="e.g. Engineering, Design, Sales" />
+    </div>
+    <div class="field">
+      <label for="jobType">Job type</label>
+      <select id="jobType">
+        <option>Full-time</option>
+        <option>Part-time</option>
+        <option>Internship</option>
+        <option>Contract</option>
+      </select>
+    </div>
+    <div class="field" style="display:flex;gap:12px">
+      <div style="flex:1">
+        <label for="salaryMin">Salary min</label>
+        <input type="number" id="salaryMin" min="0" />
+      </div>
+      <div style="flex:1">
+        <label for="salaryMax">Salary max</label>
+        <input type="number" id="salaryMax" min="0" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="description">Description</label>
+      <textarea id="description" required></textarea>
+    </div>
+    <div class="field">
+      <label for="requirements">Requirements (one per line)</label>
+      <textarea id="requirements" placeholder="3+ years experience&#10;Familiar with REST APIs"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary" style="width:100%">Publish job</button>
+    <p id="msg" class="form-msg"></p>
+  </form>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+const gate = document.getElementById('gate');
+const form = document.getElementById('job-form');
+const user = Auth.getUser();
+
+if (!user) {
+  gate.innerHTML = `<p class="form-msg error">You need to <a href="login.html" style="color:var(--brand)">log in</a> as an employer to post a job.</p>`;
+} else if (user.role !== 'employer') {
+  gate.innerHTML = `<p class="form-msg error">Only employer accounts can post jobs.</p>`;
+} else {
+  form.style.display = 'block';
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('msg');
+  msg.textContent = '';
+  msg.className = 'form-msg';
+  try {
+    const requirements = document.getElementById('requirements').value
+      .split('\n')
+      .map((r) => r.trim())
+      .filter(Boolean);
+
+    await apiRequest('/jobs', {
+      method: 'POST',
+      auth: true,
+      body: {
+        title: document.getElementById('title').value,
+        company: document.getElementById('company').value,
+        location: document.getElementById('location').value,
+        category: document.getElementById('category').value || 'General',
+        jobType: document.getElementById('jobType').value,
+        salaryMin: Number(document.getElementById('salaryMin').value) || 0,
+        salaryMax: Number(document.getElementById('salaryMax').value) || 0,
+        description: document.getElementById('description').value,
+        requirements,
+      },
+    });
+    window.location.href = 'employer-dashboard.html';
+  } catch (err) {
+    msg.textContent = err.message;
+    msg.classList.add('error');
+  }
+});
+</script>
+</body>
+</html>

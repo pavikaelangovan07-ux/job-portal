@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fieldnote — Find your next role</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">field<span>note</span></a>
+    <nav class="main-nav">
+      <a href="index.html">Find jobs</a>
+      <a href="post-job.html">Post a job</a>
+    </nav>
+    <div id="nav-user-slot"></div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>A quieter way to find work that fits.</h1>
+    <p class="lede">Search real openings from real teams, apply in a few clicks, and track every application in one place.</p>
+    <form id="search-form" class="search-bar">
+      <input type="text" id="q" placeholder="Job title or keyword" />
+      <input type="text" id="location" placeholder="Location" />
+      <select id="jobType">
+        <option value="">Any job type</option>
+        <option value="Full-time">Full-time</option>
+        <option value="Part-time">Part-time</option>
+        <option value="Internship">Internship</option>
+        <option value="Contract">Contract</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  </div>
+</section>
+
+<div class="container">
+  <h2 class="section-title" id="results-title">Latest openings</h2>
+  <div id="job-list" class="job-grid">
+    <p style="color:var(--ink-soft)">Loading jobs…</p>
+  </div>
+</div>
+
+<footer class="site-footer">Fieldnote — a demo job portal.</footer>
+
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
